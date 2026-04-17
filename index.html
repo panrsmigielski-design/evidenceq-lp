@@ -1,0 +1,1913 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EvidenceQ — Każde pytanie egzaminacyjne ma swój rodowód</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,300;1,9..144,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ─── RESET & TOKENS ─────────────────────────────────────────── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  /* ── EQ Design System — Primitives (source of truth) ── */
+  --ds-primary-50:  #edf0f2;
+  --ds-primary-100: #d6daeb;
+  --ds-primary-200: #a5b4d9;
+  --ds-primary-300: #4d72d2;
+  --ds-primary-400: #174ace;
+  --ds-primary-500: #003db4;
+  --ds-primary-600: #042a90;
+  --ds-primary-700: #08246c;
+  --ds-primary-800: #0b1d4b;
+  --ds-primary-900: #0a142f;
+  --ds-primary-950: #08101e;
+
+  --ds-gray-50:  #f1f1f1;
+  --ds-gray-100: #e2e2e1;
+  --ds-gray-200: #c9c9c7;
+  --ds-gray-300: #b5b5b1;
+  --ds-gray-400: #a2a29c;
+  --ds-gray-500: #828278;
+  --ds-gray-600: #6a6a63;
+  --ds-gray-700: #535350;
+  --ds-gray-800: #3e3e3a;
+  --ds-gray-900: #292928;
+  --ds-gray-950: #1c1c1b;
+
+  /* ── Spacing / Radius (from DS Theme) ── */
+  --ds-radius-none: 0px;
+  --ds-radius-sm:   2px;
+  --ds-radius:      4px;
+  --ds-radius-md:   6px;
+  --ds-radius-lg:   8px;
+  --ds-radius-xl:   12px;
+  --ds-radius-2xl:  16px;
+  --ds-radius-3xl:  24px;
+  --ds-radius-full: 9999px;
+
+  --ds-spacing-1:  4px;
+  --ds-spacing-2:  8px;
+  --ds-spacing-3:  12px;
+  --ds-spacing-4:  16px;
+  --ds-spacing-5:  20px;
+  --ds-spacing-6:  24px;
+  --ds-spacing-8:  32px;
+  --ds-spacing-10: 40px;
+  --ds-spacing-12: 48px;
+  --ds-spacing-16: 64px;
+  --ds-spacing-20: 80px;
+  --ds-spacing-24: 96px;
+
+  /* ── Transitions (from DS Theme) ── */
+  --ds-transition-instant: 100ms ease-out;
+  --ds-transition-fast:    150ms ease-out;
+  --ds-transition-normal:  250ms ease-out;
+  --ds-transition-slow:    400ms ease-in-out;
+  --ds-transition-spring:  500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ── Semantic aliases — mapowanie EQ → DS ── */
+
+  /* surfaces */
+  --background:        #f5f3ee;   /* jasne tło (cream) */
+  --surface-subtle:    #ede9e0;   /* cream-d */
+  --surface-raised:    #ffffff;
+  --surface-inverse:   #080d1a;   /* navy-950 */
+  --surface-dark:      #0c1428;   /* navy-900 */
+  --surface-dark-raised: #0f1e3d; /* navy-800 */
+  --surface-dark-border: #162554; /* navy-700 */
+
+  /* text */
+  --foreground:        #0e0e13;
+  --text-secondary:    #3c3c4e;
+  --text-muted:        #7a7a90;
+  --text-disabled:     #b0b0c0;
+
+  /* fill / primary */
+  --primary:           #4f7ef5;
+  --primary-hover:     #3a6ef0;
+  --primary-light:     #7fa5f8;
+  --primary-subtle:    #d6e4ff;
+
+  /* brand accent */
+  --brand-accent:      #0fb8a0;
+  --brand-accent-dark: #0a8a78;
+
+  /* borders */
+  --border:            rgba(0,0,0,0.08);
+  --border-inverse:    rgba(255,255,255,0.07);
+
+
+  /* ── Radius — przekierowane na DS ── */
+  --r:    var(--ds-radius-lg);
+  --r-lg: var(--ds-radius-2xl);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--background);
+  color: var(--foreground);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ─── NAV ────────────────────────────────────────────────────── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 100;
+  height: 64px;
+  display: flex; align-items: center;
+  padding: 0 64px;
+  background: rgba(8,13,26,0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border-inverse);
+  transition: background .3s;
+}
+
+.nav-logo {
+  color: #fff;
+  text-decoration: none;
+  display: flex; align-items: center;
+  margin-right: 48px;
+}
+.nav-logo svg { display: block; }
+.nav-logo .eq-mark {
+  width: 28px; height: 28px;
+  background: var(--primary);
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: #fff;
+}
+
+.nav-links {
+  display: flex; gap: 32px; list-style: none;
+  margin-right: auto;
+}
+.nav-links a {
+  font-size: 13.5px; font-weight: 400;
+  color: rgba(255,255,255,.55);
+  text-decoration: none;
+  transition: color .15s;
+}
+.nav-links a:hover { color: rgba(255,255,255,.9); }
+
+.nav-actions { display: flex; align-items: center; gap: 12px; }
+
+.btn-ghost {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 500;
+  color: rgba(255,255,255,.7);
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 100px;
+  padding: 8px 18px;
+  cursor: pointer; text-decoration: none;
+  transition: all .15s;
+}
+.btn-ghost:hover {
+  color: #fff;
+  border-color: rgba(255,255,255,.35);
+  background: rgba(255,255,255,.06);
+}
+
+.btn-primary {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 600;
+  color: #fff;
+  background: var(--primary);
+  border: none;
+  border-radius: 100px;
+  padding: 9px 20px;
+  cursor: pointer; text-decoration: none;
+  transition: all .2s;
+  white-space: nowrap;
+}
+.btn-primary:hover {
+  background: #3a6ef0;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(79,126,245,.35);
+}
+
+/* ─── HERO ───────────────────────────────────────────────────── */
+#hero {
+  background: var(--surface-inverse);
+  min-height: 100vh;
+  padding-top: 64px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Atmospheric grid */
+.hero-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(79,126,245,.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(79,126,245,.06) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse 80% 60% at 60% 40%, black 30%, transparent 80%);
+}
+
+/* Glow orbs */
+.hero-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+}
+.hero-orb-1 {
+  width: 700px; height: 700px;
+  background: radial-gradient(circle, rgba(29,58,138,.55) 0%, transparent 70%);
+  top: -200px; right: -100px;
+}
+.hero-orb-2 {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(15,184,160,.2) 0%, transparent 70%);
+  bottom: 100px; left: 20%;
+}
+
+.hero-inner {
+  position: relative; z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 80px 64px 80px;
+  flex: 1;
+}
+
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--primary-light);
+  background: rgba(79,126,245,.1);
+  border: 1px solid rgba(79,126,245,.2);
+  border-radius: 100px;
+  padding: 5px 14px;
+  margin-bottom: 24px;
+}
+.hero-eyebrow .pulse {
+  width: 6px; height: 6px;
+  background: var(--brand-accent);
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,100% { opacity:1; transform:scale(1); }
+  50% { opacity:.4; transform:scale(.8); }
+}
+
+.hero-h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(42px, 4.5vw, 64px);
+  font-weight: 300;
+  line-height: 1.08;
+  letter-spacing: -.03em;
+  color: #fff;
+  margin-bottom: 28px;
+}
+.hero-h1 em {
+  font-style: italic;
+  font-weight: 300;
+  color: var(--primary-light);
+  position: relative;
+}
+.hero-h1 .accent-word {
+  position: relative;
+  display: inline-block;
+}
+.hero-h1 .accent-word::after {
+  content: '';
+  position: absolute;
+  bottom: 4px; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--brand-accent), var(--primary));
+  border-radius: 2px;
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: underlineIn 1s .8s cubic-bezier(.16,1,.3,1) forwards;
+}
+@keyframes underlineIn { to { transform: scaleX(1); } }
+
+.hero-sub {
+  font-size: 17px; font-weight: 300;
+  color: rgba(255,255,255,.55);
+  line-height: 1.75;
+  max-width: 480px;
+  margin-bottom: 40px;
+}
+.hero-sub strong { color: rgba(255,255,255,.8); font-weight: 500; }
+
+.hero-actions {
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 56px;
+}
+
+.btn-hero-primary {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px; font-weight: 600;
+  color: #fff;
+  background: var(--primary);
+  border: none; border-radius: 100px;
+  padding: 14px 28px;
+  cursor: pointer; text-decoration: none;
+  display: inline-flex; align-items: center; gap: 8px;
+  transition: all .2s;
+}
+.btn-hero-primary:hover {
+  background: #3a6ef0;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(79,126,245,.4);
+}
+.btn-hero-primary .arrow { transition: transform .2s; }
+.btn-hero-primary:hover .arrow { transform: translateX(3px); }
+
+.btn-hero-secondary {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px; font-weight: 400;
+  color: rgba(255,255,255,.6);
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 100px;
+  padding: 13px 24px;
+  cursor: pointer; text-decoration: none;
+  display: inline-flex; align-items: center; gap: 8px;
+  transition: all .2s;
+}
+.btn-hero-secondary:hover {
+  color: rgba(255,255,255,.9);
+  border-color: rgba(255,255,255,.25);
+  background: rgba(255,255,255,.05);
+}
+
+.hero-trust {
+  display: flex; align-items: center; gap: 20px;
+  opacity: 0;
+  animation: fadeUp .7s 1.2s ease forwards;
+}
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(12px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.hero-trust-label {
+  font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .08em;
+  color: rgba(255,255,255,.3);
+  white-space: nowrap;
+}
+.hero-trust-logos {
+  display: flex; align-items: center; gap: 16px;
+  flex-wrap: wrap;
+}
+.trust-logo {
+  font-size: 12px; font-weight: 600;
+  color: rgba(255,255,255,.35);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 6px;
+  padding: 5px 12px;
+  white-space: nowrap;
+  transition: all .2s;
+}
+.trust-logo:hover { color: rgba(255,255,255,.7); border-color: rgba(255,255,255,.25); }
+
+/* ─── HERO PRODUCT VISUAL ───────────────────────────────────── */
+.hero-visual {
+  position: relative;
+  opacity: 0;
+  animation: slideIn .9s .4s cubic-bezier(.16,1,.3,1) forwards;
+}
+@keyframes slideIn {
+  from { opacity:0; transform:translateX(32px) translateY(8px); }
+  to   { opacity:1; transform:translateX(0) translateY(0); }
+}
+
+.product-window {
+  background: var(--surface-dark-raised);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  box-shadow: 0 32px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.04);
+}
+
+.window-bar {
+  background: var(--surface-dark);
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  padding: 12px 16px;
+  display: flex; align-items: center; gap: 8px;
+}
+.win-dot { width: 8px; height: 8px; border-radius: 50%; }
+.win-dot.r { background: #ff5f57; }
+.win-dot.y { background: #febc2e; }
+.win-dot.g { background: #28c840; }
+.window-title {
+  margin-left: auto; margin-right: auto;
+  font-size: 11px; font-weight: 500;
+  color: rgba(255,255,255,.3);
+  letter-spacing: .03em;
+}
+
+.window-body { padding: 20px; }
+
+/* Question cards in product mockup */
+.q-list { display: flex; flex-direction: column; gap: 8px; }
+
+.q-card {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 8px;
+  padding: 14px 16px;
+  transition: all .15s;
+  cursor: default;
+  animation: cardIn .5s both;
+}
+.q-card:nth-child(1) { animation-delay: .7s; }
+.q-card:nth-child(2) { animation-delay: .85s; }
+.q-card:nth-child(3) { animation-delay: 1.0s; }
+.q-card:nth-child(4) { animation-delay: 1.15s; }
+.q-card:nth-child(5) { animation-delay: 1.3s; }
+@keyframes cardIn {
+  from { opacity:0; transform:translateY(8px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.q-card:hover {
+  background: rgba(255,255,255,.07);
+  border-color: rgba(79,126,245,.25);
+}
+
+.q-card-top {
+  display: flex; align-items: flex-start;
+  gap: 10px; margin-bottom: 8px;
+}
+.q-type {
+  font-size: 9px; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 100px;
+  flex-shrink: 0; margin-top: 1px;
+}
+.q-type.tekst { background: rgba(79,126,245,.2); color: var(--primary-light); }
+.q-type.grafika { background: rgba(15,184,160,.15); color: var(--brand-accent); }
+.q-type.kazus { background: rgba(251,191,36,.12); color: #fbbf24; }
+
+.q-text {
+  font-size: 12px; font-weight: 400;
+  color: rgba(255,255,255,.75);
+  line-height: 1.5;
+  flex: 1;
+}
+
+.q-source {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 10px; font-weight: 500;
+  color: var(--brand-accent);
+  background: rgba(15,184,160,.08);
+  border: 1px solid rgba(15,184,160,.2);
+  border-radius: 4px;
+  padding: 3px 8px;
+}
+.q-source-icon { font-size: 9px; opacity: .7; }
+
+/* ─── SECTION: PROBLEM ──────────────────────────────────────── */
+#problem {
+  background: var(--background);
+  padding: 120px 64px;
+}
+.problem-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+.section-eyebrow {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px; font-weight: 700;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--primary);
+  margin-bottom: 16px;
+  display: flex; align-items: center; gap: 10px;
+}
+.section-eyebrow::before {
+  content: '';
+  width: 24px; height: 1px;
+  background: var(--primary);
+  display: block;
+}
+.section-h2 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(32px, 3vw, 46px);
+  font-weight: 300;
+  letter-spacing: -.03em;
+  line-height: 1.1;
+  color: var(--foreground);
+  margin-bottom: 20px;
+}
+.section-h2 em {
+  font-style: italic;
+  color: var(--primary);
+}
+.section-p {
+  font-size: 16px; font-weight: 300;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  max-width: 480px;
+}
+.section-p + .section-p { margin-top: 16px; }
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.stat-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 28px 28px 24px;
+  transition: transform .2s, box-shadow .2s;
+  position: relative;
+  overflow: hidden;
+}
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--primary), var(--brand-accent));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .3s;
+}
+.stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,.07); }
+.stat-card:hover::before { transform: scaleX(1); }
+
+.stat-number {
+  font-family: 'Fraunces', serif;
+  font-size: 48px; font-weight: 600;
+  color: var(--foreground);
+  letter-spacing: -.04em;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.stat-number span { font-size: 28px; color: var(--primary); }
+.stat-label {
+  font-size: 13px; font-weight: 400;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.stat-card.featured {
+  background: var(--surface-dark);
+  border-color: var(--surface-dark-border);
+  grid-column: 1 / -1;
+  display: flex; align-items: center;
+  gap: 24px;
+  padding: 24px 28px;
+}
+.stat-card.featured .stat-number { color: #fff; font-size: 40px; margin-bottom: 0; }
+.stat-card.featured .stat-number span { color: var(--primary-light); }
+.stat-card.featured .stat-label { color: rgba(255,255,255,.55); }
+.stat-card.featured::before { background: linear-gradient(90deg, var(--brand-accent), var(--primary)); }
+
+/* ─── SECTION: JAK DZIAŁA ───────────────────────────────────── */
+#how {
+  background: var(--surface-inverse);
+  padding: 120px 64px;
+  position: relative;
+  overflow: hidden;
+}
+#how::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(79,126,245,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(79,126,245,.04) 1px, transparent 1px);
+  background-size: 80px 80px;
+}
+.how-inner {
+  position: relative; z-index: 1;
+  max-width: 1280px; margin: 0 auto;
+}
+.how-header {
+  display: flex; align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 64px;
+}
+.how-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: rgba(255,255,255,.06);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.06);
+}
+.step {
+  background: var(--surface-dark);
+  padding: 40px 36px;
+  position: relative;
+  transition: background .2s;
+}
+.step:hover { background: var(--surface-dark-raised); }
+
+.step-num {
+  font-family: 'Fraunces', serif;
+  font-size: 64px; font-weight: 300;
+  color: rgba(255,255,255,.06);
+  letter-spacing: -.05em;
+  line-height: 1;
+  margin-bottom: 24px;
+  user-select: none;
+}
+.step-icon {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+.step-icon.blue { background: rgba(79,126,245,.15); }
+.step-icon.teal { background: rgba(15,184,160,.12); }
+.step-icon.green { background: rgba(34,197,94,.1); }
+
+.step-title {
+  font-family: 'Fraunces', serif;
+  font-size: 22px; font-weight: 400;
+  color: #fff;
+  letter-spacing: -.02em;
+  margin-bottom: 12px;
+  line-height: 1.2;
+}
+.step-desc {
+  font-size: 14px; font-weight: 300;
+  color: rgba(255,255,255,.5);
+  line-height: 1.75;
+}
+.step-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-top: 20px;
+  font-size: 11px; font-weight: 600;
+  padding: 5px 12px; border-radius: 100px;
+  border: 1px solid;
+}
+.step-badge.blue { color: var(--primary-light); background: rgba(79,126,245,.1); border-color: rgba(79,126,245,.2); }
+.step-badge.teal { color: var(--brand-accent); background: rgba(15,184,160,.08); border-color: rgba(15,184,160,.2); }
+.step-badge.green { color: #86efac; background: rgba(34,197,94,.08); border-color: rgba(34,197,94,.2); }
+
+/* ─── SECTION: PRZEWAGI ─────────────────────────────────────── */
+#features {
+  background: var(--background);
+  padding: 120px 64px;
+}
+.features-inner { max-width: 1280px; margin: 0 auto; }
+.features-header { margin-bottom: 64px; }
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+.feature-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 36px 36px 32px;
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 20px;
+  align-items: start;
+  transition: all .2s;
+  position: relative;
+  overflow: hidden;
+}
+.feature-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 36px; right: 36px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--primary-subtle), transparent);
+  transform: scaleX(0);
+  transition: transform .3s;
+}
+.feature-card:hover {
+  border-color: rgba(79,126,245,.2);
+  box-shadow: 0 4px 20px rgba(0,0,0,.05);
+  transform: translateY(-2px);
+}
+.feature-card:hover::after { transform: scaleX(1); }
+
+.feature-icon {
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  background: var(--background);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.feature-title {
+  font-family: 'Fraunces', serif;
+  font-size: 20px; font-weight: 400;
+  letter-spacing: -.02em;
+  color: var(--foreground);
+  margin-bottom: 10px;
+  line-height: 1.2;
+}
+.feature-desc {
+  font-size: 14px; font-weight: 300;
+  color: var(--text-secondary);
+  line-height: 1.75;
+}
+
+/* ─── SECTION: EKOSYSTEM ────────────────────────────────────── */
+#ecosystem {
+  background: var(--surface-dark);
+  padding: 120px 64px;
+  position: relative;
+  overflow: hidden;
+}
+.eco-inner {
+  max-width: 1280px; margin: 0 auto;
+  position: relative; z-index: 1;
+}
+.eco-header { margin-bottom: 64px; }
+.eco-grid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 0;
+  align-items: stretch;
+  margin-bottom: 64px;
+}
+.eco-pillar {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: var(--r-lg);
+  padding: 36px;
+  transition: all .2s;
+}
+.eco-pillar:hover {
+  background: rgba(255,255,255,.07);
+  border-color: rgba(255,255,255,.15);
+}
+.eco-pillar-tag {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--text-disabled);
+  margin-bottom: 16px;
+}
+.eco-pillar-name {
+  font-family: 'Fraunces', serif;
+  font-size: 26px; font-weight: 400;
+  color: #fff;
+  letter-spacing: -.02em;
+  margin-bottom: 12px;
+  line-height: 1.2;
+}
+.eco-pillar-logo {
+  margin-bottom: 12px;
+  display: flex; align-items: center;
+}
+.eco-pillar-logo svg { display: block; }
+.eco-pillar-desc {
+  font-size: 14px; font-weight: 300;
+  color: rgba(255,255,255,.5);
+  line-height: 1.7;
+}
+.eco-arrow {
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 32px;
+  color: rgba(255,255,255,.2);
+  font-size: 24px;
+}
+.eco-arrow svg { animation: arrowPulse 2s ease-in-out infinite; }
+@keyframes arrowPulse {
+  0%,100% { transform: translateX(0); opacity:.3; }
+  50% { transform: translateX(4px); opacity:.7; }
+}
+
+.eco-partners-row {
+  display: flex; align-items: center;
+  gap: 48px;
+  padding-top: 48px;
+  border-top: 1px solid rgba(255,255,255,.06);
+}
+.eco-partners-label {
+  font-size: 11px; font-weight: 600;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: rgba(255,255,255,.25);
+  white-space: nowrap;
+}
+.eco-partners-logos {
+  display: flex; align-items: center; gap: 20px;
+  flex-wrap: wrap;
+}
+.eco-logo-chip {
+  font-size: 12px; font-weight: 600;
+  color: rgba(255,255,255,.4);
+  padding: 6px 14px;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 6px;
+  transition: all .2s;
+}
+.eco-logo-chip:hover {
+  color: rgba(255,255,255,.75);
+  border-color: rgba(255,255,255,.2);
+}
+.eco-logo-chip.tech {
+  color: rgba(255,165,0,.6);
+  border-color: rgba(255,165,0,.15);
+}
+
+/* ─── SECTION: TESTIMONIALS ─────────────────────────────────── */
+#testimonials {
+  background: var(--background);
+  padding: 120px 64px;
+}
+.test-inner { max-width: 1280px; margin: 0 auto; }
+.test-header { margin-bottom: 56px; }
+
+.test-big {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 56px 64px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.test-big::before {
+  content: '"';
+  position: absolute;
+  top: -20px; left: 48px;
+  font-family: 'Fraunces', serif;
+  font-size: 200px; font-weight: 300;
+  color: var(--surface-subtle);
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+.test-quote {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(22px, 2.5vw, 30px);
+  font-weight: 300;
+  letter-spacing: -.02em;
+  line-height: 1.4;
+  color: var(--foreground);
+  position: relative; z-index: 1;
+  max-width: 800px;
+  margin-bottom: 36px;
+}
+.test-quote em { font-style: italic; color: var(--primary); }
+
+.test-author {
+  display: flex; align-items: center; gap: 16px;
+  position: relative; z-index: 1;
+}
+.test-avatar {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: var(--surface-subtle);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+  border: 2px solid var(--border);
+}
+.test-name {
+  font-size: 14px; font-weight: 600;
+  color: var(--foreground);
+  margin-bottom: 2px;
+}
+.test-role {
+  font-size: 12px; font-weight: 300;
+  color: var(--text-muted);
+}
+.test-badge {
+  margin-left: auto;
+  font-size: 12px; font-weight: 600;
+  color: var(--primary);
+  background: rgba(79,126,245,.08);
+  border: 1px solid rgba(79,126,245,.15);
+  border-radius: 6px;
+  padding: 6px 14px;
+}
+
+.test-cards-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.test-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 32px 36px;
+  transition: all .2s;
+}
+.test-card:hover {
+  border-color: rgba(79,126,245,.2);
+  box-shadow: 0 4px 20px rgba(0,0,0,.06);
+}
+.test-card-quote {
+  font-family: 'Fraunces', serif;
+  font-size: 17px; font-weight: 300;
+  letter-spacing: -.01em;
+  line-height: 1.55;
+  color: var(--foreground);
+  margin-bottom: 24px;
+}
+.test-card-quote::before { content: '"'; color: var(--primary-subtle); }
+.test-card-quote::after  { content: '"'; color: var(--primary-subtle); }
+
+/* ─── SECTION: CTA ───────────────────────────────────────────── */
+#cta {
+  background: var(--surface-inverse);
+  padding: 120px 64px;
+  position: relative;
+  overflow: hidden;
+}
+.cta-orb {
+  position: absolute;
+  border-radius: 50%; filter: blur(100px);
+  pointer-events: none;
+}
+.cta-orb-1 {
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(29,58,138,.5) 0%, transparent 70%);
+  top: -200px; left: -100px;
+}
+.cta-orb-2 {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(15,184,160,.18) 0%, transparent 70%);
+  bottom: -100px; right: 100px;
+}
+.cta-inner {
+  max-width: 1280px; margin: 0 auto;
+  position: relative; z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: start;
+}
+.cta-left {}
+.cta-h2 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(36px, 3.5vw, 52px);
+  font-weight: 300;
+  letter-spacing: -.03em;
+  line-height: 1.1;
+  color: #fff;
+  margin-bottom: 20px;
+}
+.cta-h2 em { font-style: italic; color: var(--primary-light); }
+.cta-sub {
+  font-size: 16px; font-weight: 300;
+  color: rgba(255,255,255,.5);
+  line-height: 1.75;
+  margin-bottom: 36px;
+  max-width: 440px;
+}
+.cta-steps {
+  display: flex; flex-direction: column; gap: 16px;
+}
+.cta-step {
+  display: flex; align-items: center; gap: 14px;
+  font-size: 14px; font-weight: 300;
+  color: rgba(255,255,255,.6);
+}
+.cta-step-num {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: rgba(79,126,245,.15);
+  border: 1px solid rgba(79,126,245,.25);
+  color: var(--primary-light);
+  font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Form */
+.cta-form-wrap {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: var(--r-lg);
+  padding: 40px 40px 36px;
+}
+.form-title {
+  font-family: 'Fraunces', serif;
+  font-size: 22px; font-weight: 400;
+  color: #fff;
+  letter-spacing: -.02em;
+  margin-bottom: 6px;
+}
+.form-sub {
+  font-size: 13px; font-weight: 300;
+  color: rgba(255,255,255,.4);
+  margin-bottom: 28px;
+}
+.form-group { margin-bottom: 14px; }
+.form-group label {
+  display: block;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: .06em; text-transform: uppercase;
+  color: rgba(255,255,255,.3);
+  margin-bottom: 6px;
+}
+.form-input {
+  width: 100%;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px; font-weight: 300;
+  color: #fff;
+  outline: none;
+  transition: all .15s;
+}
+.form-input::placeholder { color: rgba(255,255,255,.2); }
+.form-input:focus {
+  border-color: rgba(79,126,245,.45);
+  background: rgba(79,126,245,.06);
+  box-shadow: 0 0 0 3px rgba(79,126,245,.1);
+}
+select.form-input { cursor: pointer; }
+select.form-input option { background: var(--surface-dark-raised); }
+
+.form-submit {
+  width: 100%;
+  margin-top: 20px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px; font-weight: 600;
+  color: #fff;
+  background: var(--primary);
+  border: none; border-radius: 8px;
+  padding: 14px;
+  cursor: pointer;
+  transition: all .2s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.form-submit:hover {
+  background: #3a6ef0;
+  box-shadow: 0 4px 20px rgba(79,126,245,.35);
+  transform: translateY(-1px);
+}
+.form-note {
+  text-align: center;
+  margin-top: 14px;
+  font-size: 12px; font-weight: 300;
+  color: rgba(255,255,255,.25);
+}
+
+/* ─── FOOTER ─────────────────────────────────────────────────── */
+footer {
+  background: var(--surface-inverse);
+  border-top: 1px solid rgba(255,255,255,.05);
+  padding: 56px 64px 40px;
+}
+.footer-inner {
+  max-width: 1280px; margin: 0 auto;
+}
+.footer-top {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  gap: 48px;
+  margin-bottom: 48px;
+  padding-bottom: 48px;
+  border-bottom: 1px solid rgba(255,255,255,.05);
+}
+.footer-brand {}
+.footer-logo {
+  display: flex; align-items: center;
+  margin-bottom: 14px;
+  text-decoration: none;
+  color: #fff;
+}
+.footer-logo svg { display: block; }
+.footer-tagline {
+  font-size: 13px; font-weight: 300;
+  color: rgba(255,255,255,.35);
+  line-height: 1.6;
+  max-width: 240px;
+}
+
+.footer-col-title {
+  font-size: 11px; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: rgba(255,255,255,.3);
+  margin-bottom: 16px;
+}
+.footer-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.footer-links a {
+  font-size: 13.5px; font-weight: 300;
+  color: rgba(255,255,255,.45);
+  text-decoration: none;
+  transition: color .15s;
+}
+.footer-links a:hover { color: rgba(255,255,255,.8); }
+
+.footer-bottom {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.footer-copy {
+  font-size: 12px; font-weight: 300;
+  color: rgba(255,255,255,.2);
+}
+.footer-partners {
+  display: flex; align-items: center; gap: 16px;
+}
+.footer-partner-chip {
+  font-size: 11px; font-weight: 500;
+  color: rgba(255,255,255,.25);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 5px;
+  padding: 4px 10px;
+}
+
+/* ─── SCROLL REVEAL ─────────────────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity .7s ease, transform .7s cubic-bezier(.16,1,.3,1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-delay-1 { transition-delay: .1s; }
+.reveal-delay-2 { transition-delay: .2s; }
+.reveal-delay-3 { transition-delay: .3s; }
+.reveal-delay-4 { transition-delay: .4s; }
+
+/* ─── HAMBURGER & MOBILE MENU ───────────────────────────────── */
+.nav-burger {
+  display: none;
+  flex-direction: column; justify-content: center; align-items: center;
+  gap: 5px;
+  width: 40px; height: 40px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: var(--r);
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+.nav-burger span {
+  display: block;
+  width: 18px; height: 1.5px;
+  background: #fff;
+  border-radius: 2px;
+  transition: transform var(--ds-transition-normal), opacity var(--ds-transition-normal);
+  transform-origin: center;
+}
+.nav-burger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+.nav-burger[aria-expanded="true"] span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.nav-burger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+.mobile-menu {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 98;
+  background: rgba(8,13,26,0.98);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transform: translateX(100%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--ds-transition-normal), transform var(--ds-transition-slow);
+}
+.mobile-menu.open {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+.mobile-menu-inner {
+  padding: 96px 32px 48px;
+  display: flex; flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+.mobile-nav-links {
+  list-style: none;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.mobile-nav-links a {
+  display: block;
+  font-family: 'Fraunces', serif;
+  font-size: 32px; font-weight: 300;
+  letter-spacing: -.02em;
+  color: rgba(255,255,255,.65);
+  text-decoration: none;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  transition: color var(--ds-transition-fast), padding-left var(--ds-transition-fast);
+}
+.mobile-nav-links a:hover { color: #fff; padding-left: 8px; }
+.mobile-nav-actions {
+  display: flex; flex-direction: column; gap: 10px;
+}
+.mobile-nav-actions .btn-ghost,
+.mobile-nav-actions .btn-primary {
+  text-align: center;
+  font-size: 15px;
+  padding: 15px 20px;
+}
+
+/* ─── RESPONSIVE ────────────────────────────────────────────── */
+
+/* ── Tablet (≤1024px) ─────────────────────────────────────── */
+@media (max-width: 1024px) {
+  nav { padding: 0 32px; }
+
+  .hero-inner {
+    grid-template-columns: 1fr;
+    gap: 48px;
+    padding: 64px 32px 80px;
+  }
+  .hero-visual { display: none; }
+  .hero-h1 { font-size: clamp(40px, 6vw, 56px); }
+  .hero-sub { max-width: 100%; }
+
+  #problem,
+  #how,
+  #features,
+  #ecosystem,
+  #testimonials,
+  #cta { padding: 80px 32px; }
+
+  .problem-inner { grid-template-columns: 1fr; gap: 48px; }
+
+  .how-steps { grid-template-columns: 1fr; gap: 1px; }
+
+  .features-grid { grid-template-columns: 1fr; }
+
+  .eco-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .eco-arrow { display: none; }
+
+  .test-cards-row { grid-template-columns: 1fr; }
+  .test-big { padding: 40px 40px; }
+
+  .cta-inner { grid-template-columns: 1fr; gap: 48px; }
+
+  .footer-top { grid-template-columns: 1fr 1fr; gap: 32px; }
+}
+
+/* ── Mobile (≤768px) ──────────────────────────────────────── */
+@media (max-width: 768px) {
+  nav {
+    padding: 0 20px;
+    height: 56px;
+  }
+  .nav-links { display: none; }
+  .nav-actions .btn-ghost { display: none; }
+  .nav-actions .btn-primary { display: none; }
+  .nav-logo { margin-right: auto; }
+  .nav-logo svg { width: 90px; height: 18px; }
+  .nav-burger { display: flex; }
+  .mobile-menu { display: block; }
+
+  #hero { padding-top: 56px; }
+  .hero-inner { padding: 48px 20px 64px; gap: 40px; }
+  .hero-eyebrow { font-size: 10px; }
+  .hero-h1 { font-size: clamp(34px, 8vw, 44px); }
+  .hero-sub { font-size: 15px; }
+  .hero-actions { flex-direction: column; align-items: stretch; }
+  .btn-hero-primary,
+  .btn-hero-secondary { justify-content: center; }
+  .hero-trust { flex-direction: column; align-items: flex-start; gap: 12px; }
+
+  #problem,
+  #how,
+  #features,
+  #ecosystem,
+  #testimonials,
+  #cta { padding: 64px 20px; }
+
+  .section-h2 { font-size: clamp(28px, 7vw, 36px); }
+
+  .stats-grid { grid-template-columns: 1fr; }
+  .stat-card.featured { flex-direction: column; align-items: flex-start; gap: 12px; }
+
+  .how-header { flex-direction: column; align-items: flex-start; gap: 24px; }
+  .step { padding: 28px 24px; }
+
+  .feature-card { grid-template-columns: 1fr; gap: 16px; padding: 28px 24px; }
+  .feature-icon { width: 40px; height: 40px; font-size: 18px; }
+
+  .eco-pillar { padding: 28px 24px; }
+  .eco-pillar-logo svg { width: 100px; }
+  .eco-partners-row { flex-direction: column; align-items: flex-start; gap: 16px; }
+  .eco-partners-logos { gap: 10px; }
+
+  .test-big { padding: 32px 24px; }
+  .test-big::before { font-size: 120px; top: -10px; left: 20px; }
+  .test-author { flex-wrap: wrap; gap: 12px; }
+  .test-badge { margin-left: 0; }
+
+  .cta-form-wrap { padding: 28px 24px; }
+
+  footer { padding: 48px 20px 32px; }
+  .footer-top { grid-template-columns: 1fr; gap: 32px; }
+  .footer-bottom { flex-direction: column; align-items: flex-start; gap: 16px; }
+  .footer-partners { flex-wrap: wrap; gap: 8px; }
+  .footer-logo svg { width: 100px; height: 20px; }
+}
+
+/* ── Small mobile (≤480px) ────────────────────────────────── */
+@media (max-width: 480px) {
+  .hero-h1 { font-size: 32px; letter-spacing: -.02em; }
+  .btn-hero-primary { font-size: 14px; padding: 13px 22px; }
+  .btn-hero-secondary { font-size: 13px; padding: 12px 20px; }
+  .stat-number { font-size: 40px; }
+  .stat-card.featured .stat-number { font-size: 32px; }
+  .section-h2 { font-size: 28px; }
+  .cta-h2 { font-size: 28px; }
+}
+
+/* ─── NOISE TEXTURE OVERLAY ─────────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: .018;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
+</style>
+</head>
+<body>
+
+<!-- ─── NAV ─────────────────────────────────────────────────── -->
+<nav>
+  <a href="#" class="nav-logo">
+    <svg width="120" height="24" viewBox="0 0 120 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M6.35946 17.6287C5.09903 17.6287 3.99137 17.3722 3.0365 16.8593C2.08162 16.3463 1.33682 15.6304 0.802094 14.7117C0.267365 13.7929 0 12.7172 0 11.4845C0 10.5887 0.15278 9.76566 0.458339 9.01534C0.771538 8.26502 1.20696 7.61806 1.76461 7.07446C2.32989 6.5232 2.99066 6.09827 3.74692 5.79968C4.51082 5.49342 5.34729 5.3403 6.25633 5.3403C7.25704 5.3403 8.14316 5.51639 8.9147 5.86858C9.69388 6.22077 10.3394 6.71461 10.8512 7.35008C11.363 7.9779 11.7182 8.71674 11.9168 9.56659C12.1231 10.4164 12.1422 11.339 11.9741 12.3344H3.10525C3.10525 12.8703 3.24275 13.3373 3.51776 13.7355C3.8004 14.1336 4.19381 14.4475 4.69798 14.6772C5.20979 14.8992 5.80563 15.0102 6.4855 15.0102C7.15773 15.0102 7.79941 14.9184 8.41053 14.7346C9.02165 14.5509 9.59839 14.2714 10.1408 13.8963L11.2522 16.1932C10.8856 16.4764 10.4272 16.7291 9.87721 16.9511C9.32721 17.1655 8.74282 17.3301 8.12407 17.445C7.51295 17.5675 6.92474 17.6287 6.35946 17.6287ZM3.30004 10.026H8.76574C8.74282 9.34456 8.5022 8.80479 8.04386 8.40666C7.59316 8.00853 6.97058 7.80946 6.17612 7.80946C5.38167 7.80946 4.7209 8.00853 4.19381 8.40666C3.67435 8.80479 3.37643 9.34456 3.30004 10.026Z" fill="currentColor"/>
+<path d="M27.3029 17.2842V5.68483H30.6488V17.2842H27.3029ZM28.9758 3.84731C28.4182 3.84731 27.9369 3.67504 27.5321 3.33051C27.1272 2.97832 26.9248 2.51128 26.9248 1.9294C26.9248 1.33986 27.1272 0.872823 27.5321 0.528287C27.9369 0.176096 28.4182 0 28.9758 0C29.5335 0 30.0147 0.176096 30.4196 0.528287C30.8245 0.872823 31.0269 1.33986 31.0269 1.9294C31.0269 2.51128 30.8245 2.97832 30.4196 3.33051C30.0147 3.67504 29.5335 3.84731 28.9758 3.84731Z" fill="currentColor"/>
+<path d="M54.8781 17.6287C53.6176 17.6287 52.51 17.3722 51.5551 16.8593C50.6002 16.3463 49.8554 15.6304 49.3207 14.7117C48.786 13.7929 48.5186 12.7172 48.5186 11.4845C48.5186 10.5887 48.6714 9.76566 48.977 9.01534C49.2902 8.26502 49.7256 7.61806 50.2832 7.07446C50.8485 6.5232 51.5093 6.09827 52.2655 5.79968C53.0294 5.49342 53.8659 5.3403 54.775 5.3403C55.7757 5.3403 56.6618 5.51639 57.4333 5.86858C58.2125 6.22077 58.858 6.71461 59.3698 7.35008C59.8816 7.9779 60.2368 8.71674 60.4354 9.56659C60.6417 10.4164 60.6608 11.339 60.4927 12.3344H51.6239C51.6239 12.8703 51.7614 13.3373 52.0364 13.7355C52.319 14.1336 52.7124 14.4475 53.2166 14.6772C53.7284 14.8992 54.3243 15.0102 55.0041 15.0102C55.6764 15.0102 56.318 14.9184 56.9292 14.7346C57.5403 14.5509 58.117 14.2714 58.6594 13.8963L59.7709 16.1932C59.4042 16.4764 58.9458 16.7291 58.3958 16.9511C57.8458 17.1655 57.2615 17.3301 56.6427 17.445C56.0316 17.5675 55.4434 17.6287 54.8781 17.6287ZM51.8187 10.026H57.2844C57.2614 9.34456 57.0208 8.80479 56.5625 8.40666C56.1118 8.00853 55.4892 7.80946 54.6948 7.80946C53.9003 7.80946 53.2395 8.00853 52.7124 8.40666C52.193 8.80479 51.8951 9.34456 51.8187 10.026Z" fill="currentColor"/>
+<path d="M63.1491 17.2842V5.68483H66.495V6.99406C66.9381 6.41218 67.4614 5.99108 68.0648 5.73077C68.676 5.47045 69.3138 5.3403 69.9784 5.3403C71.0555 5.3403 71.9416 5.55467 72.6368 5.98343C73.3396 6.40453 73.859 6.95196 74.1951 7.62571C74.5389 8.29947 74.7108 9.00768 74.7108 9.75035V17.2842H71.3649V10.7954C71.3649 10.0604 71.1586 9.47472 70.7461 9.03831C70.3413 8.6019 69.753 8.38369 68.9815 8.38369C68.4926 8.38369 68.061 8.49471 67.6867 8.71674C67.3124 8.93112 67.0183 9.23354 66.8044 9.62402C66.5982 10.0145 66.495 10.4662 66.495 10.9792V17.2842H63.1491Z" fill="currentColor"/>
+<path d="M83.5132 17.6287C82.291 17.6287 81.1986 17.3607 80.2361 16.8248C79.2736 16.2889 78.5135 15.5577 77.9558 14.6313C77.4058 13.7048 77.1308 12.6559 77.1308 11.4845C77.1308 10.604 77.2951 9.79246 77.6235 9.04979C77.952 8.29947 78.4104 7.64868 78.9986 7.09743C79.5944 6.53851 80.2895 6.10593 81.084 5.79968C81.8785 5.49342 82.7378 5.3403 83.6622 5.3403C84.5101 5.3403 85.2931 5.45514 86.0111 5.68483C86.7369 5.91452 87.3938 6.25906 87.982 6.71844L86.4695 9.22206C86.1028 8.89284 85.6941 8.64783 85.2434 8.48705C84.8004 8.32627 84.3306 8.24588 83.834 8.24588C83.1389 8.24588 82.5392 8.37221 82.0351 8.62487C81.5385 8.87752 81.1528 9.24503 80.8777 9.72738C80.6104 10.2097 80.4767 10.7916 80.4767 11.473C80.4767 12.4913 80.7746 13.2876 81.3705 13.8618C81.9739 14.436 82.7951 14.7231 83.834 14.7231C84.3917 14.7231 84.9149 14.6198 85.4038 14.4131C85.9004 14.2063 86.3396 13.9192 86.7216 13.5517L88.131 16.0898C87.4969 16.5645 86.775 16.9396 85.9653 17.2153C85.1556 17.4909 84.3382 17.6287 83.5132 17.6287Z" fill="currentColor"/>
+<path d="M95.6255 17.6287C94.3651 17.6287 93.2574 17.3722 92.3026 16.8593C91.3477 16.3463 90.6029 15.6304 90.0682 14.7117C89.5334 13.7929 89.2661 12.7172 89.2661 11.4845C89.2661 10.5887 89.4188 9.76566 89.7244 9.01534C90.0376 8.26502 90.473 7.61806 91.0307 7.07446C91.596 6.5232 92.2567 6.09827 93.013 5.79968C93.7769 5.49342 94.6134 5.3403 95.5224 5.3403C96.5231 5.3403 97.4092 5.51639 98.1808 5.86858C98.9599 6.22077 99.6054 6.71461 100.117 7.35008C100.629 7.9779 100.984 8.71674 101.183 9.56659C101.389 10.4164 101.408 11.339 101.24 12.3344H92.3713C92.3713 12.8703 92.5088 13.3373 92.7838 13.7355C93.0665 14.1336 93.4599 14.4475 93.964 14.6772C94.4759 14.8992 95.0717 15.0102 95.7516 15.0102C96.4238 15.0102 97.0655 14.9184 97.6766 14.7346C98.2877 14.5509 98.8645 14.2714 99.4068 13.8963L100.518 16.1932C100.152 16.4764 99.6933 16.7291 99.1433 16.9511C98.5933 17.1655 98.0089 17.3301 97.3901 17.445C96.779 17.5675 96.1908 17.6287 95.6255 17.6287ZM92.5661 10.026H98.0318C98.0089 9.34456 97.7683 8.80479 97.3099 8.40666C96.8592 8.00853 96.2367 7.80946 95.4422 7.80946C94.6477 7.80946 93.987 8.00853 93.4599 8.40666C92.9404 8.80479 92.6425 9.34456 92.5661 10.026Z" fill="currentColor"/>
+<path d="M13.1207 5.68483L17.2916 17.2842H21.1645L25.2094 5.68483H21.6802L19.2316 13.7377L16.7301 5.68483H13.1207Z" fill="currentColor"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M35.9789 16.8593C36.8498 17.3722 37.8428 17.6287 38.9581 17.6287C40.0963 17.6287 41.055 17.3952 41.8342 16.9282C42.3385 16.6209 42.7549 16.2575 43.0832 15.838V17.2842H45.9936V0.746493H42.6478V6.68196C42.3019 6.36836 41.9238 6.10872 41.5134 5.90304C40.7877 5.52788 39.955 5.3403 39.0154 5.3403C38.1599 5.3403 37.3769 5.49725 36.6664 5.81116C35.956 6.12507 35.3411 6.56148 34.8216 7.12039C34.3022 7.67931 33.8973 8.3301 33.607 9.07276C33.3244 9.81542 33.1831 10.6193 33.1831 11.4845C33.1831 12.6942 33.4313 13.7623 33.9279 14.6887C34.432 15.6151 35.1157 16.3386 35.9789 16.8593ZM39.5769 14.7231C40.1651 14.7231 40.6922 14.593 41.1582 14.3327C41.6241 14.0647 41.9908 13.6895 42.2582 13.2072C42.5255 12.7248 42.6592 12.1506 42.6592 11.4845C42.6592 10.8184 42.5255 10.2442 42.2582 9.76183C41.9984 9.27948 41.6356 8.90815 41.1696 8.64783C40.7036 8.37986 40.1727 8.24588 39.5769 8.24588C38.981 8.24588 38.4501 8.37986 37.9842 8.64783C37.5182 8.90815 37.1515 9.27948 36.8841 9.76183C36.6168 10.2442 36.4831 10.8184 36.4831 11.4845C36.4831 12.1506 36.6168 12.7248 36.8841 13.2072C37.1515 13.6895 37.5182 14.0647 37.9842 14.3327C38.4501 14.593 38.981 14.7231 39.5769 14.7231Z" fill="currentColor"/>
+<path d="M110.314 1.17032C112.226 1.17034 113.915 1.5941 115.381 2.44151C116.845 3.28827 117.975 4.46695 118.773 5.97542L118.775 5.97898C119.591 7.47079 120 9.20272 120 11.1742C120 13.1388 119.594 14.8745 118.784 16.3812L118.773 16.3966C118.513 16.884 118.218 17.3372 117.887 17.7551C117.206 18.6138 116.986 19.8213 117.59 20.7386L117.592 20.7416L117.639 20.8116C118.535 22.1795 117.55 23.9998 115.894 24C115.181 24 114.518 23.6374 114.137 23.0411L113.636 22.2574L113.534 22.1113C113.001 21.4071 112.096 21.0816 111.201 21.1465C110.912 21.1675 110.615 21.1774 110.314 21.1774C108.402 21.1774 106.723 20.754 105.276 19.9068C105.097 19.8021 105.019 19.639 105.017 19.4668C105.014 19.2866 105.096 19.1007 105.242 18.9812C105.601 18.6857 105.935 18.3657 106.245 18.0217L106.248 18.0187C106.479 17.7559 106.691 17.4848 106.886 17.2053C107.008 17.03 107.124 16.8506 107.232 16.6686L107.256 16.6359C107.28 16.6147 107.316 16.6114 107.342 16.6294L107.344 16.63C107.377 16.6516 107.408 16.6723 107.44 16.6923C108.18 17.1604 109.036 17.4137 110.004 17.4582C110.117 17.4634 110.224 17.4052 110.281 17.3068C110.337 17.2085 110.335 17.0866 110.274 16.991L109.067 15.1011C108.399 14.0557 109.152 12.6811 110.41 12.6811H111.221C111.887 12.6811 112.507 13.0156 112.87 13.5669L114.011 15.2988C114.082 15.4065 114.197 15.4763 114.324 15.4835H114.327C114.453 15.4896 114.573 15.4337 114.65 15.3249C114.652 15.3217 114.654 15.3182 114.656 15.3149L114.889 14.9527C114.892 14.9492 114.894 14.9456 114.896 14.942C114.974 14.808 115.047 14.6694 115.115 14.5288L115.116 14.5264C115.562 13.5837 115.786 12.4663 115.786 11.1742C115.786 9.88712 115.563 8.7825 115.12 7.86052C115.119 7.85598 115.118 7.85073 115.116 7.84627C114.669 6.90325 114.035 6.18294 113.217 5.68389C112.416 5.16639 111.448 4.90731 110.314 4.90729C109.22 4.90729 108.264 5.16523 107.447 5.67974L107.438 5.68449L107.408 5.70289L107.389 5.71299C107.365 5.72732 107.338 5.71766 107.328 5.70052C106.775 4.75083 106.081 3.93483 105.245 3.25433C104.97 3.03001 104.983 2.61345 105.276 2.4421C106.723 1.59476 108.402 1.17032 110.314 1.17032Z" fill="currentColor"/>
+</svg>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#how">Jak działa</a></li>
+    <li><a href="#features">Dla uczelni</a></li>
+    <li><a href="#ecosystem">Partnerzy</a></li>
+    <li><a href="#cta">Kontakt</a></li>
+  </ul>
+  <div class="nav-actions">
+    <a href="#" class="btn-ghost">Zaloguj się</a>
+    <a href="#cta" class="btn-primary">Umów prezentację</a>
+  </div>
+  <button class="nav-burger" id="navBurger" aria-label="Menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- ─── MOBILE MENU ──────────────────────────────────────────── -->
+<div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+  <div class="mobile-menu-inner">
+    <ul class="mobile-nav-links">
+      <li><a href="#how">Jak działa</a></li>
+      <li><a href="#features">Dla uczelni</a></li>
+      <li><a href="#ecosystem">Partnerzy</a></li>
+      <li><a href="#cta">Kontakt</a></li>
+    </ul>
+    <div class="mobile-nav-actions">
+      <a href="#" class="btn-ghost">Zaloguj się</a>
+      <a href="#cta" class="btn-primary">Umów prezentację</a>
+    </div>
+  </div>
+</div>
+
+<!-- ─── HERO ─────────────────────────────────────────────────── -->
+<section id="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-orb hero-orb-1"></div>
+  <div class="hero-orb hero-orb-2"></div>
+
+  <div class="hero-inner">
+    <div class="hero-left">
+      <div class="hero-eyebrow">
+        <span class="pulse"></span>
+        Dla uczelni medycznych
+      </div>
+
+      <h1 class="hero-h1">
+        Każde pytanie<br>
+        egzaminacyjne<br>
+        ma swój <span class="accent-word"><em>rodowód.</em></span>
+      </h1>
+
+      <p class="hero-sub">
+        EvidenceQ generuje pytania z bezpośrednim zakotwiczeniem
+        w oficjalnych podręcznikach <strong>PZWL i Medico.</strong>
+        Żadnych halucynacji AI — tylko pytania z weryfikowalnym źródłem,
+        przypisanym do konkretnej strony i akapitu.
+      </p>
+
+      <div class="hero-actions">
+        <a href="#cta" class="btn-hero-primary">
+          Umów prezentację
+          <span class="arrow">→</span>
+        </a>
+        <a href="#how" class="btn-hero-secondary">
+          Zobacz jak działa
+        </a>
+      </div>
+
+      <div class="hero-trust">
+        <span class="hero-trust-label">Zaufały nam</span>
+        <div class="hero-trust-logos">
+          <span class="trust-logo">GUMed</span>
+          <span class="trust-logo">UJ CM</span>
+          <span class="trust-logo">WUM</span>
+          <span class="trust-logo">UM Łódź</span>
+          <span class="trust-logo">+ 4 uczelnie</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="product-window">
+        <div class="window-bar">
+          <div class="win-dot r"></div>
+          <div class="win-dot y"></div>
+          <div class="win-dot g"></div>
+          <div class="window-title">EvidenceQ — Generowanie pytań · Chirurgia ogólna</div>
+        </div>
+        <div class="window-body">
+          <div class="q-list">
+
+            <div class="q-card">
+              <div class="q-card-top">
+                <span class="q-type tekst">Tekst</span>
+                <span class="q-text">Który z poniższych objawów jest najbardziej charakterystyczny dla ostrego zapalenia wyrostka robaczkowego u dorosłego pacjenta?</span>
+              </div>
+              <div class="q-source">
+                <span class="q-source-icon">📖</span>
+                PZWL · Chirurgia ogólna · s. 312, akapit 3
+              </div>
+            </div>
+
+            <div class="q-card">
+              <div class="q-card-top">
+                <span class="q-type grafika">Grafika</span>
+                <span class="q-text">Na podstawie przedstawionego obrazu RTG klatki piersiowej wskaż najbardziej prawdopodobne rozpoznanie.</span>
+              </div>
+              <div class="q-source">
+                <span class="q-source-icon">📖</span>
+                Medico · Radiologia kliniczna · s. 87, ryc. 4.12
+              </div>
+            </div>
+
+            <div class="q-card">
+              <div class="q-card-top">
+                <span class="q-type tekst">Tekst</span>
+                <span class="q-text">Pacjent 45 lat. Podaj wskazania do cholecystektomii laparoskopowej w kamicy żółciowej objawowej.</span>
+              </div>
+              <div class="q-source">
+                <span class="q-source-icon">📖</span>
+                PZWL · Chirurgia wątroby i dróg żółciowych · s. 156
+              </div>
+            </div>
+
+            <div class="q-card">
+              <div class="q-card-top">
+                <span class="q-type kazus">Kazus</span>
+                <span class="q-text">Kobieta 32 lata, 12. tydzień ciąży. Ostre bóle brzucha. Jakie postępowanie diagnostyczne należy wdrożyć w pierwszej kolejności?</span>
+              </div>
+              <div class="q-source">
+                <span class="q-source-icon">📖</span>
+                PZWL · Chirurgia w praktyce · s. 428, rozdz. 18
+              </div>
+            </div>
+
+            <div class="q-card">
+              <div class="q-card-top">
+                <span class="q-type grafika">Grafika</span>
+                <span class="q-text">Oceń przedstawiony preparat histopatologiczny i podaj rozpoznanie wraz z uzasadnieniem.</span>
+              </div>
+              <div class="q-source">
+                <span class="q-source-icon">📖</span>
+                Medico · Patologia kliniczna · s. 201, tab. 9.3
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PROBLEM ───────────────────────────────────────────────── -->
+<section id="problem">
+  <div class="problem-inner">
+    <div class="reveal">
+      <div class="section-eyebrow">Problem</div>
+      <h2 class="section-h2">Ile godzin<br>traci <em>Twoja katedra</em><br>co roku?</h2>
+      <p class="section-p">
+        Kadra akademicka poświęca setki godzin rocznie na ręczne tworzenie pytań, formatowanie, weryfikację źródeł i ujednolicanie standardów między katedrami.
+      </p>
+      <p class="section-p" style="margin-top:16px">
+        EvidenceQ automatyzuje ten proces — zachowując pełną kontrolę merytoryczną w rękach wykładowców.
+      </p>
+    </div>
+
+    <div class="stats-grid reveal reveal-delay-2">
+      <div class="stat-card">
+        <div class="stat-number">80<span>%</span></div>
+        <div class="stat-label">redukcja czasu<br>pracy edytorskiej</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">100<span>%</span></div>
+        <div class="stat-label">pytań z weryfikowalnym<br>źródłem PZWL / Medico</div>
+      </div>
+      <div class="stat-card featured">
+        <div>
+          <div class="stat-number">0<span>×</span></div>
+        </div>
+        <div>
+          <div class="stat-label">halucynacji AI — zamknięta, certyfikowana baza wiedzy zamiast publicznych modeli generatywnych</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── JAK DZIAŁA ────────────────────────────────────────────── -->
+<section id="how">
+  <div class="how-inner">
+    <div class="how-header reveal">
+      <div>
+        <div class="section-eyebrow" style="color:var(--primary-light)">
+          <span style="background:var(--primary-light)"></span>
+          Jak działa
+        </div>
+        <h2 class="section-h2" style="color:#fff; max-width:500px">Trzy kroki od podręcznika do gotowego egzaminu</h2>
+      </div>
+    </div>
+
+    <div class="how-steps reveal">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-icon blue">📚</div>
+        <div class="step-title">Wybierz źródło</div>
+        <div class="step-desc">Wskaż podręczniki z oficjalnej bazy PZWL i Medico lub załaduj własne materiały dydaktyczne katedry. System obsługuje PDF, EPUB i dokumenty tekstowe.</div>
+        <div class="step-badge blue">PZWL · Medico · własne źródła</div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-icon teal">⚡</div>
+        <div class="step-title">EQ ekstrahuje i generuje</div>
+        <div class="step-desc">Deterministyczne AI — nie halucynuje, tylko ekstrahuje. Tworzy pytania tekstowe, graficzne i kazusy z przypisaniem do konkretnej strony i akapitu źródła.</div>
+        <div class="step-badge teal">Tekst · Grafika · Kazus kliniczny</div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-icon green">✓</div>
+        <div class="step-title">Zatwierdź i opublikuj</div>
+        <div class="step-desc">Profesor weryfikuje i zatwierdza. System automatycznie flaguje niespójności merytoryczne zanim egzamin trafi do studentów. Pełna ścieżka audytu.</div>
+        <div class="step-badge green">Weryfikacja · Zatwierdzenie · Publikacja</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PRZEWAGI ──────────────────────────────────────────────── -->
+<section id="features">
+  <div class="features-inner">
+    <div class="features-header reveal">
+      <div class="section-eyebrow">Dla uczelni</div>
+      <h2 class="section-h2">Cztery filary<br><em>EvidenceQ</em></h2>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <div class="feature-icon">🔗</div>
+        <div>
+          <div class="feature-title">Cyfrowy Rodowód Wiedzy</div>
+          <div class="feature-desc">Każde pytanie wskazuje konkretną stronę i akapit w podręczniku. Koniec ze sporami o klucz odpowiedzi — rodowód jest w źródle, jawny dla studenta i egzaminatora.</div>
+        </div>
+      </div>
+
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="feature-icon">🏛️</div>
+        <div>
+          <div class="feature-title">Własność intelektualna uczelni</div>
+          <div class="feature-desc">Bazy pytań powstałe w systemie są wyłączną własnością Twojej uczelni — wraz ze wszystkimi analizami, statystykami i historią zmian. Dane nie opuszczają systemu.</div>
+        </div>
+      </div>
+
+      <div class="feature-card reveal reveal-delay-2">
+        <div class="feature-icon">🔒</div>
+        <div>
+          <div class="feature-title">Suwerenność i bezpieczeństwo</div>
+          <div class="feature-desc">Pełna zgodność z RODO. Dane przechowywane na serwerach w Unii Europejskiej. Infrastruktura AWS z certyfikatem ISO 27001. Dane nigdy nie trenują publicznych modeli AI.</div>
+        </div>
+      </div>
+
+      <div class="feature-card reveal reveal-delay-3">
+        <div class="feature-icon">⏱️</div>
+        <div>
+          <div class="feature-title">80% mniej pracy — mierzalne</div>
+          <div class="feature-desc">System przejmuje żmudne formatowanie, weryfikację źródeł i ujednolicanie pytań. Kadra skupia się na nauczaniu i badaniach zamiast na biurokracji edytorskiej.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── EKOSYSTEM ─────────────────────────────────────────────── -->
+<section id="ecosystem">
+  <div class="eco-inner">
+    <div class="eco-header reveal">
+      <div class="section-eyebrow" style="color:var(--primary-light)">
+        <span style="background:var(--primary-light)"></span>
+        Ekosystem
+      </div>
+      <h2 class="section-h2" style="color:#fff">Jeden ekosystem —<br><em>dwa filary dydaktyki</em></h2>
+    </div>
+
+    <div class="eco-grid reveal">
+      <div class="eco-pillar">
+        <div class="eco-pillar-tag">Baza wiedzy · Partner merytoryczny</div>
+        <div class="eco-pillar-logo">
+          <svg width="135" height="18" viewBox="0 0 225 30" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M212.489 25.009H224.775V21.1233H216.575V5.00904H212.49L212.489 25.009ZM186.118 25.009H193.918L196.404 7.35192L198.889 25.009H206.689L210.032 5.00904H205.804L202.861 22.6661L200.404 5.00904H192.547L190.032 22.6948L187.09 5.00904H182.775L186.118 25.009ZM181.575 25.009V21.1233H174.261L181.204 5.00904H168.775V8.89476H175.004L168.061 25.009H181.575ZM163.375 11.7233C163.375 13.3805 162.175 14.5519 160.49 14.5519H158.232V8.89476H160.49C162.175 8.89476 163.375 10.0662 163.375 11.7233ZM154.147 25.009H158.232V18.4376H160.689C164.632 18.4376 167.461 15.4948 167.461 11.7233C167.461 7.95192 164.632 5.00904 160.689 5.00904H154.147V25.009Z" fill="white"/><path fill-rule="evenodd" clip-rule="evenodd" d="M146.65 0H116.65V30H146.65V0ZM125.402 5.02422H128.507C129.909 5.02422 131.045 6.16086 131.045 7.56294V8.27148H127.941C126.539 8.27148 125.402 7.1349 125.402 5.73276V5.02422ZM139.729 25.009H128.764C125.348 25.009 122.569 22.2301 122.569 18.8145C122.569 15.3988 125.348 12.6199 128.764 12.6199H134.768C135.95 12.6199 136.913 11.6579 136.913 10.4755C136.913 9.29298 135.951 8.33094 134.768 8.33094H133.422V5.02416H134.768C137.774 5.02416 140.219 7.46958 140.219 10.4755C140.219 13.4813 137.774 15.9267 134.768 15.9267H128.764C127.171 15.9267 125.876 17.2221 125.876 18.8144C125.876 20.4067 127.171 21.7022 128.764 21.7022H139.729V25.009Z" fill="white"/><path d="M3.36716 5.19287L9.23191 20.0584C9.34053 20.3299 9.44239 20.6129 9.53739 20.9069C9.63238 21.2011 9.71597 21.4839 9.78854 21.7553H9.89715C9.96953 21.4838 10.0533 21.2011 10.1483 20.9069C10.2433 20.6129 10.3452 20.3298 10.4538 20.0584L16.3185 5.19287H19.6853V24.9593H17.1602V10.7047C17.1602 10.4332 17.1647 10.1277 17.1738 9.7883C17.1827 9.44892 17.2053 9.14345 17.2416 8.8719H17.133C17.0787 9.14345 16.9972 9.44892 16.8886 9.7883C16.78 10.1277 16.6713 10.4332 16.5627 10.7047L10.9423 24.9594H8.68873L3.0683 10.7047C2.95968 10.4332 2.85105 10.1277 2.74243 9.7883C2.63381 9.44892 2.55235 9.14345 2.49804 8.8719H2.38941C2.42546 9.14345 2.44819 9.44892 2.45728 9.7883C2.46617 10.1277 2.4708 10.4332 2.4708 10.7047V24.9594H0V5.19287H3.36716Z" fill="white"/><path d="M24.3011 5.19287H36.7095V7.3379H26.9077V13.6914H35.4605V15.8365H26.9077V22.8144H36.8453V24.9595H24.3011V5.19287Z" fill="white"/><path d="M40.0763 5.19287H45.941C48.475 5.19287 50.5861 6.03012 52.2742 7.70444C53.962 9.37894 54.806 11.6279 54.806 14.4517V15.7007C54.806 18.5245 53.962 20.7736 52.2742 22.4479C50.5861 24.1224 48.475 24.9595 45.941 24.9595H40.0763V5.19287ZM45.941 22.8144C47.8417 22.8144 49.3554 22.1854 50.4821 20.9273C51.6089 19.6695 52.1723 17.9271 52.1723 15.7007V14.4517C52.1723 12.2253 51.6089 10.4831 50.4821 9.22501C49.3554 7.96718 47.8417 7.33799 45.941 7.33799H42.6828V22.8144L45.941 22.8144Z" fill="white"/><path d="M58.7431 5.19287H61.3496V24.9593H58.7431V5.19287Z" fill="white"/><path d="M65.2866 14.4517C65.2866 11.4107 66.0672 9.03965 67.6285 7.3379C69.1897 5.63652 71.1467 4.78564 73.5 4.78564C75.8531 4.78564 77.6971 5.4305 79.0321 6.7202C80.367 8.0099 81.0345 9.56439 81.0345 11.3835V11.5192H78.4279V11.3835C78.4279 10.1256 78.0206 9.08237 77.2061 8.2542C76.3915 7.42604 75.1561 7.01204 73.4999 7.01204C71.8797 7.01204 70.5448 7.62298 69.495 8.84475C68.445 10.0666 67.9202 11.9356 67.9202 14.4516V15.7006C67.9202 18.0176 68.4429 19.8368 69.4882 21.1581C70.5336 22.4797 71.8708 23.1402 73.4999 23.1402C75.0564 23.1402 76.233 22.7194 77.0296 21.8777C77.8259 21.036 78.2875 19.9997 78.4143 18.7688L78.4278 18.633H81.0344L81.0209 18.7688C80.8397 20.579 80.1293 22.1311 78.8895 23.4253C77.6494 24.7197 75.8529 25.3666 73.4999 25.3666C71.1466 25.3666 69.1895 24.516 67.6284 22.8144C66.0671 21.113 65.2865 18.7416 65.2865 15.7006L65.2866 14.4517Z" fill="white"/><path d="M83.7361 14.4517C83.7361 11.4107 84.5168 9.03965 86.078 7.3379C87.6393 5.63652 89.6417 4.78564 92.0853 4.78564C94.5289 4.78564 96.5314 5.63652 98.0926 7.3379C99.6538 9.03956 100.434 11.4106 100.434 14.4517V15.7007C100.434 18.7416 99.6538 21.113 98.0926 22.8144C96.5313 24.5161 94.5289 25.3667 92.0853 25.3667C89.6417 25.3667 87.6392 24.5161 86.078 22.8144C84.5168 21.1131 83.7361 18.7417 83.7361 15.7007V14.4517ZM87.9379 21.1581C88.9832 22.4797 90.3656 23.1402 92.0853 23.1402C93.8048 23.1402 95.1874 22.4797 96.2327 21.1581C97.278 19.8368 97.8007 18.0176 97.8007 15.7006V14.4517C97.8007 12.1349 97.278 10.3157 96.2327 8.99414C95.1874 7.67284 93.8048 7.01204 92.0853 7.01204C90.3656 7.01204 88.9832 7.67284 87.9379 8.99414C86.8926 10.3157 86.3699 12.1349 86.3699 14.4517V15.7007C86.3699 18.0176 86.8926 19.8368 87.9379 21.1581Z" fill="white"/><path d="M108.843 0H108.243V30H108.843V0Z" fill="white"/></svg>
+        </div>
+        <div class="eco-pillar-desc">
+          Oficjalne podręczniki medyczne, z których uczy się polskie środowisko medyczne od dekad. Wsparcie procesu nauki i dydaktyki — treści wiarygodne, aktualizowane i certyfikowane.
+        </div>
+      </div>
+
+      <div class="eco-arrow">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+          <path d="M6 16h20M20 10l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+      <div class="eco-pillar" style="border-color:rgba(79,126,245,.25); background:rgba(79,126,245,.07)">
+        <div class="eco-pillar-tag" style="color:var(--primary-light)">Silnik walidacji · EvidenceQ</div>
+        <div class="eco-pillar-logo" style="color:#fff">
+          <svg width="120" height="24" viewBox="0 0 120 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.35946 17.6287C5.09903 17.6287 3.99137 17.3722 3.0365 16.8593C2.08162 16.3463 1.33682 15.6304 0.802094 14.7117C0.267365 13.7929 0 12.7172 0 11.4845C0 10.5887 0.15278 9.76566 0.458339 9.01534C0.771538 8.26502 1.20696 7.61806 1.76461 7.07446C2.32989 6.5232 2.99066 6.09827 3.74692 5.79968C4.51082 5.49342 5.34729 5.3403 6.25633 5.3403C7.25704 5.3403 8.14316 5.51639 8.9147 5.86858C9.69388 6.22077 10.3394 6.71461 10.8512 7.35008C11.363 7.9779 11.7182 8.71674 11.9168 9.56659C12.1231 10.4164 12.1422 11.339 11.9741 12.3344H3.10525C3.10525 12.8703 3.24275 13.3373 3.51776 13.7355C3.8004 14.1336 4.19381 14.4475 4.69798 14.6772C5.20979 14.8992 5.80563 15.0102 6.4855 15.0102C7.15773 15.0102 7.79941 14.9184 8.41053 14.7346C9.02165 14.5509 9.59839 14.2714 10.1408 13.8963L11.2522 16.1932C10.8856 16.4764 10.4272 16.7291 9.87721 16.9511C9.32721 17.1655 8.74282 17.3301 8.12407 17.445C7.51295 17.5675 6.92474 17.6287 6.35946 17.6287ZM3.30004 10.026H8.76574C8.74282 9.34456 8.5022 8.80479 8.04386 8.40666C7.59316 8.00853 6.97058 7.80946 6.17612 7.80946C5.38167 7.80946 4.7209 8.00853 4.19381 8.40666C3.67435 8.80479 3.37643 9.34456 3.30004 10.026Z" fill="currentColor"/><path d="M27.3029 17.2842V5.68483H30.6488V17.2842H27.3029ZM28.9758 3.84731C28.4182 3.84731 27.9369 3.67504 27.5321 3.33051C27.1272 2.97832 26.9248 2.51128 26.9248 1.9294C26.9248 1.33986 27.1272 0.872823 27.5321 0.528287C27.9369 0.176096 28.4182 0 28.9758 0C29.5335 0 30.0147 0.176096 30.4196 0.528287C30.8245 0.872823 31.0269 1.33986 31.0269 1.9294C31.0269 2.51128 30.8245 2.97832 30.4196 3.33051C30.0147 3.67504 29.5335 3.84731 28.9758 3.84731Z" fill="currentColor"/><path d="M54.8781 17.6287C53.6176 17.6287 52.51 17.3722 51.5551 16.8593C50.6002 16.3463 49.8554 15.6304 49.3207 14.7117C48.786 13.7929 48.5186 12.7172 48.5186 11.4845C48.5186 10.5887 48.6714 9.76566 48.977 9.01534C49.2902 8.26502 49.7256 7.61806 50.2832 7.07446C50.8485 6.5232 51.5093 6.09827 52.2655 5.79968C53.0294 5.49342 53.8659 5.3403 54.775 5.3403C55.7757 5.3403 56.6618 5.51639 57.4333 5.86858C58.2125 6.22077 58.858 6.71461 59.3698 7.35008C59.8816 7.9779 60.2368 8.71674 60.4354 9.56659C60.6417 10.4164 60.6608 11.339 60.4927 12.3344H51.6239C51.6239 12.8703 51.7614 13.3373 52.0364 13.7355C52.319 14.1336 52.7124 14.4475 53.2166 14.6772C53.7284 14.8992 54.3243 15.0102 55.0041 15.0102C55.6764 15.0102 56.318 14.9184 56.9292 14.7346C57.5403 14.5509 58.117 14.2714 58.6594 13.8963L59.7709 16.1932C59.4042 16.4764 58.9458 16.7291 58.3958 16.9511C57.8458 17.1655 57.2615 17.3301 56.6427 17.445C56.0316 17.5675 55.4434 17.6287 54.8781 17.6287ZM51.8187 10.026H57.2844C57.2614 9.34456 57.0208 8.80479 56.5625 8.40666C56.1118 8.00853 55.4892 7.80946 54.6948 7.80946C53.9003 7.80946 53.2395 8.00853 52.7124 8.40666C52.193 8.80479 51.8951 9.34456 51.8187 10.026Z" fill="currentColor"/><path d="M63.1491 17.2842V5.68483H66.495V6.99406C66.9381 6.41218 67.4614 5.99108 68.0648 5.73077C68.676 5.47045 69.3138 5.3403 69.9784 5.3403C71.0555 5.3403 71.9416 5.55467 72.6368 5.98343C73.3396 6.40453 73.859 6.95196 74.1951 7.62571C74.5389 8.29947 74.7108 9.00768 74.7108 9.75035V17.2842H71.3649V10.7954C71.3649 10.0604 71.1586 9.47472 70.7461 9.03831C70.3413 8.6019 69.753 8.38369 68.9815 8.38369C68.4926 8.38369 68.061 8.49471 67.6867 8.71674C67.3124 8.93112 67.0183 9.23354 66.8044 9.62402C66.5982 10.0145 66.495 10.4662 66.495 10.9792V17.2842H63.1491Z" fill="currentColor"/><path d="M83.5132 17.6287C82.291 17.6287 81.1986 17.3607 80.2361 16.8248C79.2736 16.2889 78.5135 15.5577 77.9558 14.6313C77.4058 13.7048 77.1308 12.6559 77.1308 11.4845C77.1308 10.604 77.2951 9.79246 77.6235 9.04979C77.952 8.29947 78.4104 7.64868 78.9986 7.09743C79.5944 6.53851 80.2895 6.10593 81.084 5.79968C81.8785 5.49342 82.7378 5.3403 83.6622 5.3403C84.5101 5.3403 85.2931 5.45514 86.0111 5.68483C86.7369 5.91452 87.3938 6.25906 87.982 6.71844L86.4695 9.22206C86.1028 8.89284 85.6941 8.64783 85.2434 8.48705C84.8004 8.32627 84.3306 8.24588 83.834 8.24588C83.1389 8.24588 82.5392 8.37221 82.0351 8.62487C81.5385 8.87752 81.1528 9.24503 80.8777 9.72738C80.6104 10.2097 80.4767 10.7916 80.4767 11.473C80.4767 12.4913 80.7746 13.2876 81.3705 13.8618C81.9739 14.436 82.7951 14.7231 83.834 14.7231C84.3917 14.7231 84.9149 14.6198 85.4038 14.4131C85.9004 14.2063 86.3396 13.9192 86.7216 13.5517L88.131 16.0898C87.4969 16.5645 86.775 16.9396 85.9653 17.2153C85.1556 17.4909 84.3382 17.6287 83.5132 17.6287Z" fill="currentColor"/><path d="M95.6255 17.6287C94.3651 17.6287 93.2574 17.3722 92.3026 16.8593C91.3477 16.3463 90.6029 15.6304 90.0682 14.7117C89.5334 13.7929 89.2661 12.7172 89.2661 11.4845C89.2661 10.5887 89.4188 9.76566 89.7244 9.01534C90.0376 8.26502 90.473 7.61806 91.0307 7.07446C91.596 6.5232 92.2567 6.09827 93.013 5.79968C93.7769 5.49342 94.6134 5.3403 95.5224 5.3403C96.5231 5.3403 97.4092 5.51639 98.1808 5.86858C98.9599 6.22077 99.6054 6.71461 100.117 7.35008C100.629 7.9779 100.984 8.71674 101.183 9.56659C101.389 10.4164 101.408 11.339 101.24 12.3344H92.3713C92.3713 12.8703 92.5088 13.3373 92.7838 13.7355C93.0665 14.1336 93.4599 14.4475 93.964 14.6772C94.4759 14.8992 95.0717 15.0102 95.7516 15.0102C96.4238 15.0102 97.0655 14.9184 97.6766 14.7346C98.2877 14.5509 98.8645 14.2714 99.4068 13.8963L100.518 16.1932C100.152 16.4764 99.6933 16.7291 99.1433 16.9511C98.5933 17.1655 98.0089 17.3301 97.3901 17.445C96.779 17.5675 96.1908 17.6287 95.6255 17.6287ZM92.5661 10.026H98.0318C98.0089 9.34456 97.7683 8.80479 97.3099 8.40666C96.8592 8.00853 96.2367 7.80946 95.4422 7.80946C94.6477 7.80946 93.987 8.00853 93.4599 8.40666C92.9404 8.80479 92.6425 9.34456 92.5661 10.026Z" fill="currentColor"/><path d="M13.1207 5.68483L17.2916 17.2842H21.1645L25.2094 5.68483H21.6802L19.2316 13.7377L16.7301 5.68483H13.1207Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M35.9789 16.8593C36.8498 17.3722 37.8428 17.6287 38.9581 17.6287C40.0963 17.6287 41.055 17.3952 41.8342 16.9282C42.3385 16.6209 42.7549 16.2575 43.0832 15.838V17.2842H45.9936V0.746493H42.6478V6.68196C42.3019 6.36836 41.9238 6.10872 41.5134 5.90304C40.7877 5.52788 39.955 5.3403 39.0154 5.3403C38.1599 5.3403 37.3769 5.49725 36.6664 5.81116C35.956 6.12507 35.3411 6.56148 34.8216 7.12039C34.3022 7.67931 33.8973 8.3301 33.607 9.07276C33.3244 9.81542 33.1831 10.6193 33.1831 11.4845C33.1831 12.6942 33.4313 13.7623 33.9279 14.6887C34.432 15.6151 35.1157 16.3386 35.9789 16.8593ZM39.5769 14.7231C40.1651 14.7231 40.6922 14.593 41.1582 14.3327C41.6241 14.0647 41.9908 13.6895 42.2582 13.2072C42.5255 12.7248 42.6592 12.1506 42.6592 11.4845C42.6592 10.8184 42.5255 10.2442 42.2582 9.76183C41.9984 9.27948 41.6356 8.90815 41.1696 8.64783C40.7036 8.37986 40.1727 8.24588 39.5769 8.24588C38.981 8.24588 38.4501 8.37986 37.9842 8.64783C37.5182 8.90815 37.1515 9.27948 36.8841 9.76183C36.6168 10.2442 36.4831 10.8184 36.4831 11.4845C36.4831 12.1506 36.6168 12.7248 36.8841 13.2072C37.1515 13.6895 37.5182 14.0647 37.9842 14.3327C38.4501 14.593 38.981 14.7231 39.5769 14.7231Z" fill="currentColor"/><path d="M110.314 1.17032C112.226 1.17034 113.915 1.5941 115.381 2.44151C116.845 3.28827 117.975 4.46695 118.773 5.97542L118.775 5.97898C119.591 7.47079 120 9.20272 120 11.1742C120 13.1388 119.594 14.8745 118.784 16.3812L118.773 16.3966C118.513 16.884 118.218 17.3372 117.887 17.7551C117.206 18.6138 116.986 19.8213 117.59 20.7386L117.592 20.7416L117.639 20.8116C118.535 22.1795 117.55 23.9998 115.894 24C115.181 24 114.518 23.6374 114.137 23.0411L113.636 22.2574L113.534 22.1113C113.001 21.4071 112.096 21.0816 111.201 21.1465C110.912 21.1675 110.615 21.1774 110.314 21.1774C108.402 21.1774 106.723 20.754 105.276 19.9068C105.097 19.8021 105.019 19.639 105.017 19.4668C105.014 19.2866 105.096 19.1007 105.242 18.9812C105.601 18.6857 105.935 18.3657 106.245 18.0217L106.248 18.0187C106.479 17.7559 106.691 17.4848 106.886 17.2053C107.008 17.03 107.124 16.8506 107.232 16.6686L107.256 16.6359C107.28 16.6147 107.316 16.6114 107.342 16.6294L107.344 16.63C107.377 16.6516 107.408 16.6723 107.44 16.6923C108.18 17.1604 109.036 17.4137 110.004 17.4582C110.117 17.4634 110.224 17.4052 110.281 17.3068C110.337 17.2085 110.335 17.0866 110.274 16.991L109.067 15.1011C108.399 14.0557 109.152 12.6811 110.41 12.6811H111.221C111.887 12.6811 112.507 13.0156 112.87 13.5669L114.011 15.2988C114.082 15.4065 114.197 15.4763 114.324 15.4835H114.327C114.453 15.4896 114.573 15.4337 114.65 15.3249C114.652 15.3217 114.654 15.3182 114.656 15.3149L114.889 14.9527C114.892 14.9492 114.894 14.9456 114.896 14.942C114.974 14.808 115.047 14.6694 115.115 14.5288L115.116 14.5264C115.562 13.5837 115.786 12.4663 115.786 11.1742C115.786 9.88712 115.563 8.7825 115.12 7.86052C115.119 7.85598 115.118 7.85073 115.116 7.84627C114.669 6.90325 114.035 6.18294 113.217 5.68389C112.416 5.16639 111.448 4.90731 110.314 4.90729C109.22 4.90729 108.264 5.16523 107.447 5.67974L107.438 5.68449L107.408 5.70289L107.389 5.71299C107.365 5.72732 107.338 5.71766 107.328 5.70052C106.775 4.75083 106.081 3.93483 105.245 3.25433C104.97 3.03001 104.983 2.61345 105.276 2.4421C106.723 1.59476 108.402 1.17032 110.314 1.17032Z" fill="currentColor"/></svg>
+        </div>
+        <div class="eco-pillar-desc">
+          Profesjonalna walidacja, rekomendacje i estymacje. Deterministyczne AI które nie generuje — ono ekstrahuje. Wynik: od swobodnej nauki do mierzalnego wyniku egzaminacyjnego.
+        </div>
+      </div>
+    </div>
+
+    <div class="eco-partners-row reveal">
+      <span class="eco-partners-label">Partnerzy</span>
+      <div class="eco-partners-logos">
+        <span class="eco-logo-chip">PZWL Wydawnictwo Lekarskie</span>
+        <span class="eco-logo-chip">Medico</span>
+        <span class="eco-logo-chip tech">Amazon Web Services</span>
+        <span class="eco-logo-chip">GUMed</span>
+        <span class="eco-logo-chip">UJ Collegium Medicum</span>
+        <span class="eco-logo-chip">WUM</span>
+        <span class="eco-logo-chip">UM Łódź</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── TESTIMONIALS ──────────────────────────────────────────── -->
+<section id="testimonials">
+  <div class="test-inner">
+    <div class="test-header reveal">
+      <div class="section-eyebrow">Opinie</div>
+      <h2 class="section-h2">Mówią o nas<br><em>praktycy</em></h2>
+    </div>
+
+    <div class="test-big reveal">
+      <div class="test-quote">
+        EvidenceQ zredukował czas przygotowania zestawu egzaminacyjnego
+        z <em>trzech dni do czterech godzin.</em> Każde pytanie ma rodowód —
+        koniec z odwołaniami studentów od klucza odpowiedzi.
+      </div>
+      <div class="test-author">
+        <div class="test-avatar">👨‍⚕️</div>
+        <div>
+          <div class="test-name">prof. dr hab. Jan Kowalski</div>
+          <div class="test-role">Kierownik Katedry Chirurgii Ogólnej · Gdański Uniwersytet Medyczny</div>
+        </div>
+        <div class="test-badge">GUMed</div>
+      </div>
+    </div>
+
+    <div class="test-cards-row">
+      <div class="test-card reveal">
+        <div class="test-card-quote">
+          Standaryzacja egzaminów na poziomie wydziału — to był nasz główny problem od lat. EvidenceQ go rozwiązał w ciągu jednego semestru.
+        </div>
+        <div class="test-author">
+          <div class="test-avatar">👩‍🏫</div>
+          <div>
+            <div class="test-name">dr hab. Anna Nowak</div>
+            <div class="test-role">Prodziekan ds. kształcenia · UJ Collegium Medicum</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="test-card reveal reveal-delay-2">
+        <div class="test-card-quote">
+          Jako kierownik kliniki doceniam przede wszystkim to, że pytania mają rodowód. Student kwestionuje? Pokazuję mu stronę podręcznika.
+        </div>
+        <div class="test-author">
+          <div class="test-avatar">👨‍🔬</div>
+          <div>
+            <div class="test-name">dr hab. Piotr Wiśniewski</div>
+            <div class="test-role">Kierownik Kliniki Kardiologii · Warszawski Uniwersytet Medyczny</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CTA + FORMULARZ ───────────────────────────────────────── -->
+<section id="cta">
+  <div class="cta-orb cta-orb-1"></div>
+  <div class="cta-orb cta-orb-2"></div>
+
+  <div class="cta-inner">
+    <div class="cta-left reveal">
+      <div class="section-eyebrow" style="color:var(--primary-light)">
+        <span style="background:var(--primary-light)"></span>
+        Pierwsze wdrożenie
+      </div>
+      <h2 class="cta-h2">Zacznij od<br><em>pilotażu katedralnego.</em></h2>
+      <p class="cta-sub">
+        Zweryfikuj precyzję EvidenceQ w wybranej jednostce — zanim podejmiesz decyzję dla całego wydziału. Zero ryzyka, pełna kontrola.
+      </p>
+
+      <div class="cta-steps">
+        <div class="cta-step">
+          <div class="cta-step-num">1</div>
+          Wypełniasz formularz — odpowiadamy w&nbsp;24h
+        </div>
+        <div class="cta-step">
+          <div class="cta-step-num">2</div>
+          45-minutowa prezentacja na przykładzie Waszego sylabusa
+        </div>
+        <div class="cta-step">
+          <div class="cta-step-num">3</div>
+          Pilotaż w wybranej katedrze — bez zobowiązań
+        </div>
+      </div>
+    </div>
+
+    <div class="cta-form-wrap reveal reveal-delay-2">
+      <div class="form-title">Umów prezentację</div>
+      <div class="form-sub">Odpowiadamy w ciągu 24 godzin roboczych.</div>
+
+      <div class="form-group">
+        <label>Imię i nazwisko</label>
+        <input type="text" class="form-input" placeholder="prof. Jan Kowalski">
+      </div>
+      <div class="form-group">
+        <label>E-mail służbowy</label>
+        <input type="email" class="form-input" placeholder="j.kowalski@uczelnia.edu.pl">
+      </div>
+      <div class="form-group">
+        <label>Uczelnia</label>
+        <input type="text" class="form-input" placeholder="Gdański Uniwersytet Medyczny">
+      </div>
+      <div class="form-group">
+        <label>Stanowisko</label>
+        <select class="form-input">
+          <option value="" disabled selected>Wybierz stanowisko…</option>
+          <option>Rektor / Prorektor</option>
+          <option>Dziekan / Prodziekan ds. kształcenia</option>
+          <option>Kierownik Katedry / Kliniki</option>
+          <option>Pracownik IT / Centrum Informatyczne</option>
+          <option>Inne</option>
+        </select>
+      </div>
+
+      <button class="form-submit">
+        Umów prezentację →
+      </button>
+      <div class="form-note">
+        Wycena indywidualna · RODO · Dane nie są udostępniane osobom trzecim
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ────────────────────────────────────────────────── -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="#" class="footer-logo">
+          <svg width="120" height="24" viewBox="0 0 120 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.35946 17.6287C5.09903 17.6287 3.99137 17.3722 3.0365 16.8593C2.08162 16.3463 1.33682 15.6304 0.802094 14.7117C0.267365 13.7929 0 12.7172 0 11.4845C0 10.5887 0.15278 9.76566 0.458339 9.01534C0.771538 8.26502 1.20696 7.61806 1.76461 7.07446C2.32989 6.5232 2.99066 6.09827 3.74692 5.79968C4.51082 5.49342 5.34729 5.3403 6.25633 5.3403C7.25704 5.3403 8.14316 5.51639 8.9147 5.86858C9.69388 6.22077 10.3394 6.71461 10.8512 7.35008C11.363 7.9779 11.7182 8.71674 11.9168 9.56659C12.1231 10.4164 12.1422 11.339 11.9741 12.3344H3.10525C3.10525 12.8703 3.24275 13.3373 3.51776 13.7355C3.8004 14.1336 4.19381 14.4475 4.69798 14.6772C5.20979 14.8992 5.80563 15.0102 6.4855 15.0102C7.15773 15.0102 7.79941 14.9184 8.41053 14.7346C9.02165 14.5509 9.59839 14.2714 10.1408 13.8963L11.2522 16.1932C10.8856 16.4764 10.4272 16.7291 9.87721 16.9511C9.32721 17.1655 8.74282 17.3301 8.12407 17.445C7.51295 17.5675 6.92474 17.6287 6.35946 17.6287ZM3.30004 10.026H8.76574C8.74282 9.34456 8.5022 8.80479 8.04386 8.40666C7.59316 8.00853 6.97058 7.80946 6.17612 7.80946C5.38167 7.80946 4.7209 8.00853 4.19381 8.40666C3.67435 8.80479 3.37643 9.34456 3.30004 10.026Z" fill="currentColor"/><path d="M27.3029 17.2842V5.68483H30.6488V17.2842H27.3029ZM28.9758 3.84731C28.4182 3.84731 27.9369 3.67504 27.5321 3.33051C27.1272 2.97832 26.9248 2.51128 26.9248 1.9294C26.9248 1.33986 27.1272 0.872823 27.5321 0.528287C27.9369 0.176096 28.4182 0 28.9758 0C29.5335 0 30.0147 0.176096 30.4196 0.528287C30.8245 0.872823 31.0269 1.33986 31.0269 1.9294C31.0269 2.51128 30.8245 2.97832 30.4196 3.33051C30.0147 3.67504 29.5335 3.84731 28.9758 3.84731Z" fill="currentColor"/><path d="M54.8781 17.6287C53.6176 17.6287 52.51 17.3722 51.5551 16.8593C50.6002 16.3463 49.8554 15.6304 49.3207 14.7117C48.786 13.7929 48.5186 12.7172 48.5186 11.4845C48.5186 10.5887 48.6714 9.76566 48.977 9.01534C49.2902 8.26502 49.7256 7.61806 50.2832 7.07446C50.8485 6.5232 51.5093 6.09827 52.2655 5.79968C53.0294 5.49342 53.8659 5.3403 54.775 5.3403C55.7757 5.3403 56.6618 5.51639 57.4333 5.86858C58.2125 6.22077 58.858 6.71461 59.3698 7.35008C59.8816 7.9779 60.2368 8.71674 60.4354 9.56659C60.6417 10.4164 60.6608 11.339 60.4927 12.3344H51.6239C51.6239 12.8703 51.7614 13.3373 52.0364 13.7355C52.319 14.1336 52.7124 14.4475 53.2166 14.6772C53.7284 14.8992 54.3243 15.0102 55.0041 15.0102C55.6764 15.0102 56.318 14.9184 56.9292 14.7346C57.5403 14.5509 58.117 14.2714 58.6594 13.8963L59.7709 16.1932C59.4042 16.4764 58.9458 16.7291 58.3958 16.9511C57.8458 17.1655 57.2615 17.3301 56.6427 17.445C56.0316 17.5675 55.4434 17.6287 54.8781 17.6287ZM51.8187 10.026H57.2844C57.2614 9.34456 57.0208 8.80479 56.5625 8.40666C56.1118 8.00853 55.4892 7.80946 54.6948 7.80946C53.9003 7.80946 53.2395 8.00853 52.7124 8.40666C52.193 8.80479 51.8951 9.34456 51.8187 10.026Z" fill="currentColor"/><path d="M63.1491 17.2842V5.68483H66.495V6.99406C66.9381 6.41218 67.4614 5.99108 68.0648 5.73077C68.676 5.47045 69.3138 5.3403 69.9784 5.3403C71.0555 5.3403 71.9416 5.55467 72.6368 5.98343C73.3396 6.40453 73.859 6.95196 74.1951 7.62571C74.5389 8.29947 74.7108 9.00768 74.7108 9.75035V17.2842H71.3649V10.7954C71.3649 10.0604 71.1586 9.47472 70.7461 9.03831C70.3413 8.6019 69.753 8.38369 68.9815 8.38369C68.4926 8.38369 68.061 8.49471 67.6867 8.71674C67.3124 8.93112 67.0183 9.23354 66.8044 9.62402C66.5982 10.0145 66.495 10.4662 66.495 10.9792V17.2842H63.1491Z" fill="currentColor"/><path d="M83.5132 17.6287C82.291 17.6287 81.1986 17.3607 80.2361 16.8248C79.2736 16.2889 78.5135 15.5577 77.9558 14.6313C77.4058 13.7048 77.1308 12.6559 77.1308 11.4845C77.1308 10.604 77.2951 9.79246 77.6235 9.04979C77.952 8.29947 78.4104 7.64868 78.9986 7.09743C79.5944 6.53851 80.2895 6.10593 81.084 5.79968C81.8785 5.49342 82.7378 5.3403 83.6622 5.3403C84.5101 5.3403 85.2931 5.45514 86.0111 5.68483C86.7369 5.91452 87.3938 6.25906 87.982 6.71844L86.4695 9.22206C86.1028 8.89284 85.6941 8.64783 85.2434 8.48705C84.8004 8.32627 84.3306 8.24588 83.834 8.24588C83.1389 8.24588 82.5392 8.37221 82.0351 8.62487C81.5385 8.87752 81.1528 9.24503 80.8777 9.72738C80.6104 10.2097 80.4767 10.7916 80.4767 11.473C80.4767 12.4913 80.7746 13.2876 81.3705 13.8618C81.9739 14.436 82.7951 14.7231 83.834 14.7231C84.3917 14.7231 84.9149 14.6198 85.4038 14.4131C85.9004 14.2063 86.3396 13.9192 86.7216 13.5517L88.131 16.0898C87.4969 16.5645 86.775 16.9396 85.9653 17.2153C85.1556 17.4909 84.3382 17.6287 83.5132 17.6287Z" fill="currentColor"/><path d="M95.6255 17.6287C94.3651 17.6287 93.2574 17.3722 92.3026 16.8593C91.3477 16.3463 90.6029 15.6304 90.0682 14.7117C89.5334 13.7929 89.2661 12.7172 89.2661 11.4845C89.2661 10.5887 89.4188 9.76566 89.7244 9.01534C90.0376 8.26502 90.473 7.61806 91.0307 7.07446C91.596 6.5232 92.2567 6.09827 93.013 5.79968C93.7769 5.49342 94.6134 5.3403 95.5224 5.3403C96.5231 5.3403 97.4092 5.51639 98.1808 5.86858C98.9599 6.22077 99.6054 6.71461 100.117 7.35008C100.629 7.9779 100.984 8.71674 101.183 9.56659C101.389 10.4164 101.408 11.339 101.24 12.3344H92.3713C92.3713 12.8703 92.5088 13.3373 92.7838 13.7355C93.0665 14.1336 93.4599 14.4475 93.964 14.6772C94.4759 14.8992 95.0717 15.0102 95.7516 15.0102C96.4238 15.0102 97.0655 14.9184 97.6766 14.7346C98.2877 14.5509 98.8645 14.2714 99.4068 13.8963L100.518 16.1932C100.152 16.4764 99.6933 16.7291 99.1433 16.9511C98.5933 17.1655 98.0089 17.3301 97.3901 17.445C96.779 17.5675 96.1908 17.6287 95.6255 17.6287ZM92.5661 10.026H98.0318C98.0089 9.34456 97.7683 8.80479 97.3099 8.40666C96.8592 8.00853 96.2367 7.80946 95.4422 7.80946C94.6477 7.80946 93.987 8.00853 93.4599 8.40666C92.9404 8.80479 92.6425 9.34456 92.5661 10.026Z" fill="currentColor"/><path d="M13.1207 5.68483L17.2916 17.2842H21.1645L25.2094 5.68483H21.6802L19.2316 13.7377L16.7301 5.68483H13.1207Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M35.9789 16.8593C36.8498 17.3722 37.8428 17.6287 38.9581 17.6287C40.0963 17.6287 41.055 17.3952 41.8342 16.9282C42.3385 16.6209 42.7549 16.2575 43.0832 15.838V17.2842H45.9936V0.746493H42.6478V6.68196C42.3019 6.36836 41.9238 6.10872 41.5134 5.90304C40.7877 5.52788 39.955 5.3403 39.0154 5.3403C38.1599 5.3403 37.3769 5.49725 36.6664 5.81116C35.956 6.12507 35.3411 6.56148 34.8216 7.12039C34.3022 7.67931 33.8973 8.3301 33.607 9.07276C33.3244 9.81542 33.1831 10.6193 33.1831 11.4845C33.1831 12.6942 33.4313 13.7623 33.9279 14.6887C34.432 15.6151 35.1157 16.3386 35.9789 16.8593ZM39.5769 14.7231C40.1651 14.7231 40.6922 14.593 41.1582 14.3327C41.6241 14.0647 41.9908 13.6895 42.2582 13.2072C42.5255 12.7248 42.6592 12.1506 42.6592 11.4845C42.6592 10.8184 42.5255 10.2442 42.2582 9.76183C41.9984 9.27948 41.6356 8.90815 41.1696 8.64783C40.7036 8.37986 40.1727 8.24588 39.5769 8.24588C38.981 8.24588 38.4501 8.37986 37.9842 8.64783C37.5182 8.90815 37.1515 9.27948 36.8841 9.76183C36.6168 10.2442 36.4831 10.8184 36.4831 11.4845C36.4831 12.1506 36.6168 12.7248 36.8841 13.2072C37.1515 13.6895 37.5182 14.0647 37.9842 14.3327C38.4501 14.593 38.981 14.7231 39.5769 14.7231Z" fill="currentColor"/><path d="M110.314 1.17032C112.226 1.17034 113.915 1.5941 115.381 2.44151C116.845 3.28827 117.975 4.46695 118.773 5.97542L118.775 5.97898C119.591 7.47079 120 9.20272 120 11.1742C120 13.1388 119.594 14.8745 118.784 16.3812L118.773 16.3966C118.513 16.884 118.218 17.3372 117.887 17.7551C117.206 18.6138 116.986 19.8213 117.59 20.7386L117.592 20.7416L117.639 20.8116C118.535 22.1795 117.55 23.9998 115.894 24C115.181 24 114.518 23.6374 114.137 23.0411L113.636 22.2574L113.534 22.1113C113.001 21.4071 112.096 21.0816 111.201 21.1465C110.912 21.1675 110.615 21.1774 110.314 21.1774C108.402 21.1774 106.723 20.754 105.276 19.9068C105.097 19.8021 105.019 19.639 105.017 19.4668C105.014 19.2866 105.096 19.1007 105.242 18.9812C105.601 18.6857 105.935 18.3657 106.245 18.0217L106.248 18.0187C106.479 17.7559 106.691 17.4848 106.886 17.2053C107.008 17.03 107.124 16.8506 107.232 16.6686L107.256 16.6359C107.28 16.6147 107.316 16.6114 107.342 16.6294L107.344 16.63C107.377 16.6516 107.408 16.6723 107.44 16.6923C108.18 17.1604 109.036 17.4137 110.004 17.4582C110.117 17.4634 110.224 17.4052 110.281 17.3068C110.337 17.2085 110.335 17.0866 110.274 16.991L109.067 15.1011C108.399 14.0557 109.152 12.6811 110.41 12.6811H111.221C111.887 12.6811 112.507 13.0156 112.87 13.5669L114.011 15.2988C114.082 15.4065 114.197 15.4763 114.324 15.4835H114.327C114.453 15.4896 114.573 15.4337 114.65 15.3249C114.652 15.3217 114.654 15.3182 114.656 15.3149L114.889 14.9527C114.892 14.9492 114.894 14.9456 114.896 14.942C114.974 14.808 115.047 14.6694 115.115 14.5288L115.116 14.5264C115.562 13.5837 115.786 12.4663 115.786 11.1742C115.786 9.88712 115.563 8.7825 115.12 7.86052C115.119 7.85598 115.118 7.85073 115.116 7.84627C114.669 6.90325 114.035 6.18294 113.217 5.68389C112.416 5.16639 111.448 4.90731 110.314 4.90729C109.22 4.90729 108.264 5.16523 107.447 5.67974L107.438 5.68449L107.408 5.70289L107.389 5.71299C107.365 5.72732 107.338 5.71766 107.328 5.70052C106.775 4.75083 106.081 3.93483 105.245 3.25433C104.97 3.03001 104.983 2.61345 105.276 2.4421C106.723 1.59476 108.402 1.17032 110.314 1.17032Z" fill="currentColor"/></svg>
+        </a>
+        <p class="footer-tagline">Inteligentne wsparcie jakości kształcenia w oparciu o źródła i suwerenność programową uczelni.</p>
+      </div>
+
+      <div>
+        <div class="footer-col-title">Logowanie</div>
+        <ul class="footer-links">
+          <li><a href="#">Panel uczelni</a></li>
+          <li><a href="#">Panel wykładowcy</a></li>
+          <li><a href="#">Panel studenta</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="footer-col-title">Produkt</div>
+        <ul class="footer-links">
+          <li><a href="#">Jak działa</a></li>
+          <li><a href="#">Dla uczelni</a></li>
+          <li><a href="#">Partnerzy</a></li>
+          <li><a href="#">Wdrożenie etapowe</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="footer-col-title">Prawne</div>
+        <ul class="footer-links">
+          <li><a href="#">Regulamin</a></li>
+          <li><a href="#">Polityka prywatności</a></li>
+          <li><a href="#">RODO</a></li>
+          <li><a href="#">Kontakt</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2025 EvidenceQ · evidenceq.ai · Wszelkie prawa zastrzeżone</span>
+      <div class="footer-partners">
+        <span class="footer-partner-chip">Partner merytoryczny: MEDICO + PZWL</span>
+        <span class="footer-partner-chip">Partner technologiczny: AWS</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ─── SCROLL REVEAL JS ──────────────────────────────────────── -->
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Nav background on scroll
+  const nav = document.querySelector('nav');
+  window.addEventListener('scroll', () => {
+    nav.style.background = window.scrollY > 40
+      ? 'rgba(8,13,26,0.97)'
+      : 'rgba(8,13,26,0.85)';
+  });
+
+  /* ── Mobile menu ── */
+  const burger = document.getElementById('navBurger');
+  const menu   = document.getElementById('mobileMenu');
+
+  function toggleMenu(open) {
+    burger.setAttribute('aria-expanded', open);
+    menu.setAttribute('aria-hidden', !open);
+    menu.classList.toggle('open', open);
+    document.body.style.overflow = open ? 'hidden' : '';
+  }
+
+  burger.addEventListener('click', () => {
+    const isOpen = burger.getAttribute('aria-expanded') === 'true';
+    toggleMenu(!isOpen);
+  });
+
+  menu.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => toggleMenu(false));
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') toggleMenu(false);
+  });
+</script>
+
+</body>
+</html>
